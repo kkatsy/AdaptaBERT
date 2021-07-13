@@ -507,11 +507,11 @@ def main():
     cache_dir = args.cache_dir if args.cache_dir else os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(args.local_rank))
     if args.trained_model_dir: # load in fine-tuned (with cloze-style LM objective) model
         if os.path.exists(os.path.join(args.output_dir, WEIGHTS_NAME)):
-            previous_state_dict = torch.load(os.path.join(args.output_dir, WEIGHTS_NAME))
+            previous_state_dict = torch.load(os.path.join(args.output_dir, WEIGHTS_NAME), map_location=torch.device('cpu'))
         else:
             from collections import OrderedDict
             previous_state_dict = OrderedDict()
-        distant_state_dict = torch.load(os.path.join(args.trained_model_dir, WEIGHTS_NAME))
+        distant_state_dict = torch.load(os.path.join(args.trained_model_dir, WEIGHTS_NAME), map_location=torch.device('cpu'))
         previous_state_dict.update(distant_state_dict) # note that the final layers of previous model and distant model must have different attribute names!
         model = MyBertForTokenClassification.from_pretrained(args.trained_model_dir, state_dict=previous_state_dict, num_labels=num_labels)
     else:
